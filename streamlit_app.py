@@ -52,43 +52,80 @@ def main():
         layout="centered"
     )
 
+    # Custom CSS for colorful tiles
+    st.markdown("""
+    <style>
+    .stButton>button {
+        background-color: #F0F2F6;
+        color: black;
+        border: 2px solid;
+        width: 100%;
+        height: 100px;
+    }
+    .stButton>button:hover {
+        background-color: #E6E9EF;
+        border-color: #4CAF50;
+    }
+    .refinement-button {
+        border-color: #FF6B6B !important;
+    }
+    .standup-button {
+        border-color: #4ECDC4 !important;
+    }
+    .review-button {
+        border-color: #45B7D1 !important;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
     st.title("🚀 Engineering Banter Generator")
     st.subheader("Laugh at (with) your daily engineering struggles!")
 
     banter_generator = EngineeringBanter()
     
+    # Reset the session state when the page loads
+    if 'current_quote' not in st.session_state:
+        st.session_state.current_quote = None
+        st.session_state.current_category = None
+
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("Refinement Banter"):
-            st.session_state.refinement_quote = banter_generator.get_random_banter("Refinement")
+        if st.button("Refinement Banter", key="refinement", 
+                     help="Generate a sarcastic refinement quote", 
+                     type="primary", 
+                     use_container_width=True):
+            # Clear previous quotes
+            st.session_state.current_quote = banter_generator.get_random_banter("Refinement")
+            st.session_state.current_category = "Refinement"
     
     with col2:
-        if st.button("Standup Banter"):
-            st.session_state.standup_quote = banter_generator.get_random_banter("Daily Standup")
+        if st.button("Standup Banter", key="standup", 
+                     help="Generate a witty standup quote", 
+                     type="primary", 
+                     use_container_width=True):
+            # Clear previous quotes
+            st.session_state.current_quote = banter_generator.get_random_banter("Daily Standup")
+            st.session_state.current_category = "Daily Standup"
     
     with col3:
-        if st.button("Sprint Review Banter"):
-            st.session_state.review_quote = banter_generator.get_random_banter("Sprint Review")
+        if st.button("Sprint Review Banter", key="review", 
+                     help="Generate a humorous sprint review quote", 
+                     type="primary", 
+                     use_container_width=True):
+            # Clear previous quotes
+            st.session_state.current_quote = banter_generator.get_random_banter("Sprint Review")
+            st.session_state.current_category = "Sprint Review"
 
-    # Display quotes if they exist
-    if hasattr(st.session_state, 'refinement_quote'):
-        st.subheader("Refinement Banter")
-        st.write(st.session_state.refinement_quote)
-        st.button("Copy Refinement Quote", key="copy_ref", 
-                  on_click=lambda: st.clipboard.copy(st.session_state.refinement_quote))
-
-    if hasattr(st.session_state, 'standup_quote'):
-        st.subheader("Standup Banter")
-        st.write(st.session_state.standup_quote)
-        st.button("Copy Standup Quote", key="copy_standup", 
-                  on_click=lambda: st.clipboard.copy(st.session_state.standup_quote))
-
-    if hasattr(st.session_state, 'review_quote'):
-        st.subheader("Sprint Review Banter")
-        st.write(st.session_state.review_quote)
-        st.button("Copy Review Quote", key="copy_review", 
-                  on_click=lambda: st.clipboard.copy(st.session_state.review_quote))
+    # Display the current quote if it exists
+    if st.session_state.current_quote:
+        st.subheader(f"{st.session_state.current_category} Banter")
+        st.write(st.session_state.current_quote)
+        
+        # Copy button
+        if st.button("Copy Quote", key="copy_quote"):
+            st.clipboard.copy(st.session_state.current_quote)
+            st.success("Quote copied to clipboard!")
 
 if __name__ == "__main__":
     main()
